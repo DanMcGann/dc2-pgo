@@ -11,8 +11,8 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <Eigen/CholmodSupport>
-#include <SolversTR.h>
-#include <RTRNewton.h>
+#include <Solvers/SolversTR.h>
+#include <Solvers/RTRNewton.h>
 #include <map>
 #include <memory>
 #include <tuple>

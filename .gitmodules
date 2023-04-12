@@ -1,0 +1,3 @@
+[submodule "thirdparty/ROPTLIB"]
+	path = thirdparty/ROPTLIB
+	url = https://github.com/DanMcGann/ROPTLIB.git

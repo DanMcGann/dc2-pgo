@@ -9,9 +9,9 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "RSD.h"
-#include "RTRNewton.h"
-#include "SolversLS.h"
+#include "Solvers/RSD.h"
+#include "Solvers/RTRNewton.h"
+#include "Solvers/SolversLS.h"
 
 namespace DPGO {
 
