@@ -186,7 +186,7 @@ TEST(testDPGO, testRobustPGO) {
   measurements.push_back(m_outlier);
   // Solve!
   auto pose_graph = std::make_shared<PoseGraph>(0, d, d);
-  pose_graph->setMeasurements(measurements);
+  pose_graph->setMeasurements(measurements, {});
   solveRobustPGOParams params;
   params.verbose = false;
   params.opt_params.verbose = false;

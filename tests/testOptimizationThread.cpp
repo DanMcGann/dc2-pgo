@@ -70,7 +70,8 @@ TEST(testDPGO, OptimizationThreadTriangleGraph) {
                             dT.block(0, d, d, 1), 1.0, 1.0);
   private_loop_closures.push_back(m02);
 
-  agent.setMeasurements(odometry,
+  agent.setMeasurements({},
+                        odometry,
                         private_loop_closures,
                         shared_loop_closures);
   agent.initialize();

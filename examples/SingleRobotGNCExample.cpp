@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
   CHECK(!measurements.empty());
   unsigned int dimension = measurements[0].t.size();
   auto pose_graph = std::make_shared<PoseGraph>(0, dimension, dimension);
-  pose_graph->setMeasurements(measurements);
+  pose_graph->setMeasurements(measurements, {});
 
   solveRobustPGOParams params;
   params.opt_params.verbose = false;

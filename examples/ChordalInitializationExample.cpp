@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
   // Construct optimization problem
   std::shared_ptr<PoseGraph> pose_graph = std::make_shared<PoseGraph>(0, d, d);
-  pose_graph->setMeasurements(dataset);
+  pose_graph->setMeasurements(dataset, {});
   QuadraticProblem problemCentral(pose_graph);
 
   // Compute chordal relaxation

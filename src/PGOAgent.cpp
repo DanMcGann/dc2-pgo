@@ -182,6 +182,7 @@ void PGOAgent::addMeasurement(const RelativeSEMeasurement &factor) {
 }
 
 void PGOAgent::setMeasurements(
+    const std::vector<PriorSEMeasurement> &priors,
     const std::vector<RelativeSEMeasurement> &inputOdometry,
     const std::vector<RelativeSEMeasurement> &inputPrivateLoopClosures,
     const std::vector<RelativeSEMeasurement> &inputSharedLoopClosures) {
@@ -193,7 +194,7 @@ void PGOAgent::setMeasurements(
   std::vector<RelativeSEMeasurement> measurements = inputOdometry;
   measurements.insert(measurements.end(), inputPrivateLoopClosures.begin(), inputPrivateLoopClosures.end());
   measurements.insert(measurements.end(), inputSharedLoopClosures.begin(), inputSharedLoopClosures.end());
-  mPoseGraph->setMeasurements(measurements);
+  mPoseGraph->setMeasurements(measurements, priors);
 }
 
 void PGOAgent::initialize(const PoseArray *TInitPtr) {
@@ -1191,24 +1192,6 @@ size_t PGOAgent::numActiveRobots() const {
     }
   }
   return num_active;
-}
-
-bool PGOAgent::anchorFirstPose() {
-  if (num_poses() > 0) {
-    LiftedPose prior(relaxation_rank(), dimension());
-    prior.setData(X.pose(0));
-    mPoseGraph->setPrior(0, prior);
-  } else {
-    return false;
-  }
-  return true;
-}
-
-bool PGOAgent::anchorFirstPose(const LiftedPose &prior) {
-  CHECK_EQ(prior.d(), dimension());
-  CHECK_EQ(prior.r(), relaxation_rank());
-  mPoseGraph->setPrior(0, prior);
-  return true;
 }
 
 }  // namespace DPGO

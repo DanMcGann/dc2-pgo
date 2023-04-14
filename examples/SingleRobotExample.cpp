@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
   // Construct the centralized PGO problem (used for evaluation)
   auto pose_graph = std::make_shared<PoseGraph>(0, d, d);
-  pose_graph->setMeasurements(dataset);
+  pose_graph->setMeasurements(dataset, {});
   QuadraticProblem problemCentral(pose_graph);
 
   /**
@@ -86,7 +86,8 @@ int main(int argc, char **argv) {
   */
 
   auto *agent = new PGOAgent(0, options);
-  agent->setMeasurements(odometry,
+  agent->setMeasurements({},
+                         odometry,
                          private_loop_closures,
                          shared_loop_closure);
   agent->initialize();

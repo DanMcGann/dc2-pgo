@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
   // Construct the centralized problem (used for evaluation)
   std::shared_ptr<PoseGraph> pose_graph = std::make_shared<PoseGraph>(0, r, d);
-  pose_graph->setMeasurements(dataset);
+  pose_graph->setMeasurements(dataset, {});
   QuadraticProblem problemCentral(pose_graph);
 
 
@@ -138,7 +138,8 @@ int main(int argc, char **argv) {
       agent->setLiftingMatrix(M);
     }
 
-    agent->setMeasurements(odometry[robot],
+    agent->setMeasurements({},
+                           odometry[robot],
                            private_loop_closures[robot],
                            shared_loop_closure[robot]);
     agent->initialize();

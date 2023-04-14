@@ -260,7 +260,8 @@ class PGOAgent {
    * @param inputPrivateLoopClosures
    * @param inputSharedLoopClosures
    */
-  void setMeasurements(const std::vector<RelativeSEMeasurement> &inputOdometry,
+  void setMeasurements(const std::vector<PriorSEMeasurement> &priors,
+                       const std::vector<RelativeSEMeasurement> &inputOdometry,
                        const std::vector<RelativeSEMeasurement> &inputPrivateLoopClosures,
                        const std::vector<RelativeSEMeasurement> &inputSharedLoopClosures);
 
@@ -722,11 +723,6 @@ class PGOAgent {
    * @brief Return the number of currently active robots
   */
   size_t numActiveRobots() const;
-  /**
-   * @brief Add a prior to the first pose of this robot
-  */
-  bool anchorFirstPose();
-  bool anchorFirstPose(const LiftedPose &prior);
 
  private:
   // Stores the auxiliary variables from neighbors (only used in acceleration)
