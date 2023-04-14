@@ -22,7 +22,8 @@ TEST(testDPGO, LineGraph) {
     RelativeSEMeasurement m(id, id, i, i + 1, R, t, 1.0, 1.0);
     odometry.push_back(m);
   }
-  agent.setMeasurements(odometry,
+  agent.setMeasurements({},
+                        odometry,
                         private_loop_closures,
                         shared_loop_closures);
   agent.initialize();

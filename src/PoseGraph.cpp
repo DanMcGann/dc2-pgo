@@ -13,9 +13,7 @@ namespace DPGO {
 
 PoseGraph::PoseGraph(unsigned int id, unsigned int r, unsigned int d)
     : id_(id), r_(r), d_(d), n_(0), 
-    use_inactive_neighbors_(false),
-    prior_kappa_(10000),
-    prior_tau_(100) {
+    use_inactive_neighbors_(false) {
   CHECK(r >= d);
   empty();
 }
@@ -28,6 +26,7 @@ void PoseGraph::empty() {
   // Reset this pose graph to be empty
   n_ = 0;
   edge_id_to_index_.clear();
+  priors_.clear();
   odometry_.clear();
   private_lcs_.clear();
   shared_lcs_.clear();
@@ -37,13 +36,11 @@ void PoseGraph::empty() {
   neighbor_active_.clear();
   clearNeighborPoses();
   clearDataMatrices();
-  clearPriors();
 }
 
 void PoseGraph::reset() {
   clearNeighborPoses();
-  clearDataMatrices();
-  clearPriors();
+  clearDataMatrices();;
   for (const auto neighbor_id: nbr_robot_ids_) {
     neighbor_active_[neighbor_id] = true;
   }
@@ -58,11 +55,24 @@ unsigned int PoseGraph::numMeasurements() const {
   return numOdometry() + numPrivateLoopClosures() + numSharedLoopClosures();
 }
 
-void PoseGraph::setMeasurements(const std::vector<RelativeSEMeasurement> &measurements) {
+void PoseGraph::setMeasurements(const std::vector<RelativeSEMeasurement> &measurements,
+                                const std::vector<PriorSEMeasurement> &priors) {
   // Reset this pose graph to be empty
   empty();
   for (const auto &m : measurements)
     addMeasurement(m);
+  for (const auto &p: priors)
+    addPrior(p);
+}
+
+void PoseGraph::addPrior(const PriorSEMeasurement& prior) {
+  CHECK_LT(prior.pose_idx, n());
+  CHECK_EQ(id_, prior.robot_idx);
+  CHECK_EQ(d(), prior.rotation.cols());
+  CHECK_EQ(d(), prior.rotation.rows());
+  CHECK_EQ(d(), prior.translation.rows());
+  CHECK_EQ(r_, prior.liftedPose.rows());
+  priors_.push_back(prior);
 }
 
 void PoseGraph::addMeasurement(const RelativeSEMeasurement &m) {
@@ -169,16 +179,6 @@ std::vector<RelativeSEMeasurement> PoseGraph::localMeasurements() const {
   return measurements;
 }
 
-void PoseGraph::clearPriors() {
-  priors_.clear();
-}
-
-void PoseGraph::setPrior(unsigned index, const LiftedPose &Xi) {
-  CHECK_LT(index, n());
-  CHECK_EQ(d(), Xi.d());
-  CHECK_EQ(r(), Xi.r());
-  priors_[index] = Xi;
-}
 
 void PoseGraph::setNeighborPoses(const PoseDict &pose_dict) {
   neighbor_poses_ = pose_dict;
@@ -459,12 +459,12 @@ bool PoseGraph::constructQ() {
   }
 
   // Go through priors
-  for (const auto &it : priors_) {
-    unsigned idx = it.first;
+  for (const auto &prior : priors_) {
+    unsigned idx = prior.pose_idx;
     for (unsigned row = 0; row < d_; ++row) {
-      Omega(row, row) = prior_kappa_;
+      Omega(row, row) = prior.kappa;
     }
-    Omega(d_, d_) = prior_tau_;
+    Omega(d_, d_) = prior.tau;
     QDiagRow.block(0, idx * (d_ + 1), d_ + 1, d_ + 1) += Omega;
   }
 
@@ -563,13 +563,13 @@ bool PoseGraph::constructG() {
     }
   }
   // Go through priors
-  for (const auto &it : priors_) {
-    unsigned idx = it.first;
-    const Matrix &P = it.second.getData();
+  for (const auto &prior : priors_) {
+    unsigned idx = prior.pose_idx;
+    const Matrix &P = prior.liftedPose;
     for (unsigned row = 0; row < d_; ++row) {
-      Omega(row, row) = prior_kappa_;
+      Omega(row, row) = prior.kappa;
     }
-    Omega(d_, d_) = prior_tau_;
+    Omega(d_, d_) = prior.tau;
     Matrix L = - P * Omega;
     G.block(0, idx * (d_ + 1), r_, d_ + 1) += L;
   }

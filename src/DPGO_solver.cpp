@@ -320,7 +320,7 @@ PoseArray solvePGO(const std::vector<RelativeSEMeasurement> &measurements,
 
   // Form optimization problem
   auto pose_graph = std::make_shared<PoseGraph>(robot_id, dimension, dimension);
-  pose_graph->setMeasurements(measurements);
+  pose_graph->setMeasurements(measurements, {});
   QuadraticProblem problem(pose_graph);
 
   // Initialize optimizer object

@@ -12,6 +12,7 @@
 #include "DPGO_utils.h"
 #include "manifold/Poses.h"
 #include "RelativeSEMeasurement.h"
+#include "PriorSEMeasurement.h"
 #include <glog/logging.h>
 #include <set>
 #include <map>
@@ -103,7 +104,8 @@ class PoseGraph {
    * @brief Set measurements for this pose graph
    * @param measurements
    */
-  void setMeasurements(const std::vector<RelativeSEMeasurement> &measurements);
+  void setMeasurements(const std::vector<RelativeSEMeasurement> &measurements, 
+                       const std::vector<PriorSEMeasurement> &priors);
   /**
    * @brief Add a single measurement to this pose graph. Ignored if the input measurement already exists.
    * @param m
@@ -140,16 +142,7 @@ class PoseGraph {
    * @return
    */
   std::vector<RelativeSEMeasurement> localMeasurements() const;
-  /**
-   * @brief Clear all priors
-  */
-  void clearPriors();
-  /**
-   * @brief Add a prior term
-   * @param index The index of the local variable
-   * @param Xi Corresponding prior term
-  */
-  void setPrior(unsigned index, const LiftedPose &Xi);
+
   /**
    * @brief Set neighbor poses
    * @param pose_dict
@@ -298,6 +291,9 @@ class PoseGraph {
   unsigned int r_, d_, n_;
 
   // Store odometry measurement of this robot
+  std::vector<PriorSEMeasurement> priors_;
+
+  // Store odometry measurement of this robot
   std::vector<RelativeSEMeasurement> odometry_;
 
   // Store private loop closures of this robot
@@ -351,6 +347,11 @@ class PoseGraph {
    */
   void addSharedLoopClosure(const RelativeSEMeasurement &factor);
   /**
+   * @brief Add a prior term
+   * @param prior the prior measurement
+  */
+  void addPrior(const PriorSEMeasurement& prior);
+  /**
    * @brief Construct the quadratic cost matrix
    * @return
    */
@@ -379,13 +380,6 @@ class PoseGraph {
 
   // Use measurements with inactive neighbors when constructing data matrices
   bool use_inactive_neighbors_;
-
-  // Weights for prior terms (TODO: expose as parameter)
-  double prior_kappa_;
-  double prior_tau_;
-
-  // Priors
-  std::map<unsigned, LiftedPose> priors_;
 };
 
 }
